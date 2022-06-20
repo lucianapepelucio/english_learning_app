@@ -1,0 +1,18 @@
+Pydantic - validação dos dados
+
+@app.get("/users/{user_name}")
+async def get_user(user_name: str):
+   search = list(filter(lambda x: x["name"] == user_name, users))
+
+    if search == []:
+        return {'Error': 'User not found'}
+
+    return {'User': search[0]}
+    
+
+@app.post("/users")
+async def add_user(user: User):
+    users.append(user)
+    return user
+
+

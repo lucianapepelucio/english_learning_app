@@ -1,12 +1,12 @@
 from fastapi import FastAPI
-from pydantic import BaseModel, Field  
+from pydantic import BaseModel, Field
 
 app = FastAPI()
 
-def find_user_id():
+def find_next_id():
     return max(user.user_id for user in users) + 1
 class User(BaseModel):
-    user_id: int = Field(default_factory=find_user_id, alias="id")
+    user_id: int = Field(default_factory=find_next_id, alias="id")
     name: str
     password: str
 
@@ -21,11 +21,11 @@ users = [
 async def main():
     return("English Learning App")
 
-@app.get("/users", status_code=200)
+@app.get("/users")
 async def get_users_list():
-    return users
+    return {'Users List': users}
 
-@app.get("/users/{user_id}", status_code=200)
+@app.get("/users/{user_id}")
 async def get_user(user_id: int):
     search = list(filter(lambda x: x["id"] == user_id, users))
 
@@ -34,25 +34,26 @@ async def get_user(user_id: int):
 
     return {'User': search[0]}
 
-@app.post("/users", status_code=201)
-async def add_user(user: User):
+@app.post("/users/{user_id}")
+async def create_user(user_id: int, user: User):
+    search = list(filter(lambda x: x["id"] == user_id, users))
+
+    if search != []:
+        return {'Error': 'User already exists!'}
+
+    user = user.dict()
+    user['id'] = user_id
+
     users.append(user)
     return user
 
-# @app.get("/users/{user_name}")
-# async def get_user(user_name: str):
-#     search = list(filter(lambda x: x["name"] == user_name, users))
 
-#     if search == []:
-#         return {'Error': 'User not found'}
-
-#     return {'User': search[0]}
 
 # @app.put("/items/{item_id}")
 # async def update_item(item_id: int, item: Item):
 #     return {"item_price": item.price, "item_id": item_id}
 
 # Criar 
-# @app.put com id
-# @app.delete com id
-# @app.patch com id
+# @app.put com id 
+# @app.delete com id 
+# @app.patch com id 
