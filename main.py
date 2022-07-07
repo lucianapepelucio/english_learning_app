@@ -3,57 +3,46 @@ from pydantic import BaseModel, Field
 
 app = FastAPI()
 
+users = [
+    {"id": 1, "username": "Luciana", "password": "123456"},
+    {"id": 2, "username": "Maria", "password": "2345vlw"},
+    {"id": 3, "username": "Carlos", "password": "654321"},
+    {"id": 4, "username": "Marcos", "password": "canguru123"}
+]
+
 def find_next_id():
-    return max(user.user_id for user in users) + 1
+    i = 0
+    for user in range(users.length):
+        users.append(i)
+        i +=1
+        return user
+
 class User(BaseModel):
-    user_id: int = Field(default_factory=find_next_id, alias="id")
-    name: str
+    id: int = Field(default_factory=find_next_id)
+    username: str
     password: str
 
-users = [
-    {"id": 1, "name": "Luciana", "password": "123456"},
-    {"id": 2, "name": "Maria", "password": "2345vlw"},
-    {"id": 3, "name": "Carlos", "password": "654321"},
-    {"id": 4, "name": "Marcos", "password": "canguru123"}
-]
 
 @app.get("/")
 async def main():
     return("English Learning App")
 
+
 @app.get("/users")
 async def get_users_list():
     return {'Users List': users}
 
-@app.get("/users/{user_id}")
-async def get_user(user_id: int):
-    search = list(filter(lambda x: x["id"] == user_id, users))
 
-    if search == []:
+@app.get("/users/{id}")
+async def get_user(id: int, user: User):
+    if user.id in users:
+        return {'User': user}
+    else:
         return {'Error': 'User not found!'}
 
-    return {'User': search[0]}
 
-@app.post("/users/{user_id}")
-async def create_user(user_id: int, user: User):
-    search = list(filter(lambda x: x["id"] == user_id, users))
-
-    if search != []:
-        return {'Error': 'User already exists!'}
-
-    user = user.dict()
-    user['id'] = user_id
-
+@app.post("/users")
+async def add_user(user: User):
     users.append(user)
     return user
 
-
-
-# @app.put("/items/{item_id}")
-# async def update_item(item_id: int, item: Item):
-#     return {"item_price": item.price, "item_id": item_id}
-
-# Criar 
-# @app.put com id 
-# @app.delete com id 
-# @app.patch com id 
