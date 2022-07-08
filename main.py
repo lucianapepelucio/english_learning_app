@@ -15,7 +15,7 @@ def find_next_id():
     for user in range(users.length):
         users.append(i)
         i +=1
-        return user
+        return user   #percorrer todo o array e adicionar 1 ao último
 
 class User(BaseModel):
     id: int = Field(default_factory=find_next_id)
@@ -34,11 +34,12 @@ async def get_users_list():
 
 
 @app.get("/users/{id}")
-async def get_user(id: int, user: User):
-    if user.id in users:
-        return {'User': user}
-    else:
-        return {'Error': 'User not found!'}
+async def get_user(id: int):
+    for user in users:
+        if id == user["id"]:
+            return {'User': user}
+        else:
+            return {'Error': 'User not found!'}
 
 
 @app.post("/users")
