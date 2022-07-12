@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Path, Query
 from pydantic import BaseModel, Field
 
 app = FastAPI()
@@ -10,15 +10,15 @@ users = [
     {"id": 4, "username": "Marcos", "password": "canguru123"}
 ]
 
-def find_next_id():
-    i = 0
-    for user in range(users.length):
-        users.append(i)
-        i +=1
-        return user   #percorrer todo o array e adicionar 1 ao último
+# def find_next_id():
+#     for i in range(len(users)):
+#         users.append(i)
+#         i +=1
+#         return i      percorrer todo o array e adicionar 1 ao último
 
 class User(BaseModel):
-    id: int = Field(default_factory=find_next_id)
+    # id: int = Field(default_factory=find_next_id)
+    id: int
     username: str
     password: str
 
@@ -47,3 +47,17 @@ async def add_user(user: User):
     users.append(user)
     return user
 
+
+@app.put("/users/{id}")
+async def update_user(
+    id: int = Path(title="Pegar o id do usuário a ser atualizado"), 
+    username: str = Query(default=None), 
+    password: str = Query(default=None)
+):
+    user = {"id": id}
+    
+    if username:
+        user.update({"username": username})
+    if password:
+        user.update({"password": password})
+    return {'User': user}
